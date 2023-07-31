@@ -1,0 +1,16 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core">
+
+  <div id="editor:${it.name}:holder">&amp;nbsp;</div>
+  <input id="editor:${it.name}:value" type="hidden" value="${it.getValues()}"/>
+
+  <script>
+  {
+    const valueElement = document.getElementById("editor:${it.name}:value")
+    const options = new Map(Object.entries(JSON.parse(it.getOptions())));
+    const editor = new JSONEditor(document.getElementById('editor:${it.name}:holder'), options)
+    editor.on('change', function() { valueElement.value = JSON.stringify(editor.getValue()) } );
+  }
+  </script>
+
+</j:jelly>
