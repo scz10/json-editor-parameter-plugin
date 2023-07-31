@@ -1,14 +1,16 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core">
+<j:jelly xmlns:j="jelly:core" escapeText="">
 
   <div id="editor:${it.name}:holder">&amp;nbsp;</div>
-  <input id="editor:${it.name}:value" type="hidden" value="${it.getValues()}"/>
-
+  <div id="editor:${it.name}:options" hidden="hidden"><j:out value='${it.getMergedOptions()}'/></div>
+  <input id="editor:${it.name}:value" type="hidden"/>
   <script>
   {
-    const valueElement = document.getElementById("editor:${it.name}:value")
-    const options = new Map(Object.entries(JSON.parse(it.getOptions())));
-    const editor = new JSONEditor(document.getElementById('editor:${it.name}:holder'), options)
+    const holderElement = document.getElementById('editor:${it.name}:holder')
+    const options = JSON.parse(document.getElementById('editor:${it.name}:options').innerHTML)
+    const editor = new JSONEditor(holderElement, options)
+
+    const valueElement = document.getElementById('editor:${it.name}:value')
     editor.on('change', function() { valueElement.value = JSON.stringify(editor.getValue()) } );
   }
   </script>
