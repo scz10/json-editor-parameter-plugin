@@ -1,4 +1,4 @@
-package io.jenkins.plugins.json_editor_choice;
+package io.jenkins.plugins.json_editor_parameter;
 
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;

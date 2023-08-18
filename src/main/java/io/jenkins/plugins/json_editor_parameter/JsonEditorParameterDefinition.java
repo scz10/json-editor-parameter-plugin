@@ -1,4 +1,4 @@
-package io.jenkins.plugins.json_editor_choice;
+package io.jenkins.plugins.json_editor_parameter;
 
 import com.fasterxml.jackson.jr.ob.JSON;
 import edu.umd.cs.findbugs.annotations.NonNull;

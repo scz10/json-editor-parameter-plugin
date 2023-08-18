@@ -10,11 +10,11 @@
   </parent>
 
   <groupId>io.jenkins.plugins</groupId>
-  <artifactId>json-editor-choice</artifactId>
+  <artifactId>json-editor-parameter</artifactId>
   <version>${revision}${changelist}</version>
   <packaging>hpi</packaging>
 
-  <name>Json Editor Choice Plugin</name>
+  <name>Json Editor Parameter</name>
 
   <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
   <inceptionYear>2023</inceptionYear>

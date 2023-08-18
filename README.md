@@ -1,8 +1,8 @@
-# json-editor-choice
+# json-editor-parameter
 
 ## Introduction
 
-Add choices to an input step using the [json-editor](https://github.com/json-editor/json-editor) web form.
+Add parameters to an input step using the [json-editor](https://github.com/json-editor/json-editor) web form.
 The json editor generates an HTML form from a JSON Schema.
 
 ## Getting started

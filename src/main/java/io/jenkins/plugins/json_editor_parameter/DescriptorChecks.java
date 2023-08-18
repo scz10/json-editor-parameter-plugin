@@ -1,4 +1,4 @@
-package io.jenkins.plugins.json_editor_choice;
+package io.jenkins.plugins.json_editor_parameter;
 
 import hudson.util.FormValidation;
 import org.kohsuke.stapler.QueryParameter;
