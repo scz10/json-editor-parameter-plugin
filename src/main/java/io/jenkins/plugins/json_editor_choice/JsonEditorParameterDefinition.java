@@ -8,64 +8,124 @@ import hudson.model.ParameterValue;
 import hudson.model.StringParameterValue;
 import hudson.util.FormValidation;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.java.Log;
 import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.DoNotUse;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.verb.POST;
 
 @EqualsAndHashCode(callSuper = true)
-@Getter
+@Log
 public class JsonEditorParameterDefinition extends ParameterDefinition {
-    private static final String EMPTY_MAP = "{}";
 
-    private String options = EMPTY_MAP;
-    private String schema = EMPTY_MAP;
-    private String startval = EMPTY_MAP;
+    private static final Pattern OK_NAME = Pattern.compile("[A-Za-z][\\w-]{0,63}");
+
+    private String schema;
+    private String startval = "{}";
+    private String options = "{}";
 
     @DataBoundConstructor
     public JsonEditorParameterDefinition(String name) {
         super(name);
+        log.fine("JsonEditorParameterDefinition: " + name);
+        if (!isValidName(name)) {
+            throw new IllegalArgumentException("Invalid Name - " + name);
+        }
     }
 
-    private static String replaceEmpty(String json) {
-        return json == null || json.isEmpty() ? EMPTY_MAP : json;
+    @SneakyThrows
+    static String toJsonString(Map<String, Object> object) {
+        return object == null || object.isEmpty() ? null : JSON.std.asString(object);
+    }
+
+    @SneakyThrows
+    static Map<String, Object> toMap(String json) {
+        return json == null || json.isEmpty() ? Map.of() : JSON.std.mapFrom(json);
+    }
+
+    private static void checkValidJson(String options, String errorMessage) {
+        try {
+            JSON.std.mapFrom(options);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(errorMessage);
+        }
+    }
+
+    private static boolean isValidName(String name) {
+        return OK_NAME.matcher(name).matches();
+    }
+
+    public String getSchema() {
+        log.fine("getSchema: " + schema);
+        return schema;
     }
 
     @DataBoundSetter
-    public JsonEditorParameterDefinition setSchema(String schema) {
-        this.schema = replaceEmpty(schema);
-        return this;
+    public void setSchema(String schema) {
+        log.fine("setSchema: " + schema);
+        checkValidJson(schema, "schema must be valid json");
+        this.schema = schema;
+    }
+
+    public String getStartval() {
+        log.fine("getStartval: " + startval);
+        return startval;
     }
 
     @DataBoundSetter
-    public JsonEditorParameterDefinition setOptions(String options) {
-        this.options = replaceEmpty(options);
-        return this;
+    public void setStartval(String startval) {
+        log.fine("setStartval: " + startval);
+        checkValidJson(startval, "startval must be valid json");
+        this.startval = startval;
+    }
+
+    public String getOptions() {
+        log.fine("getOptions: " + options);
+        return options;
     }
 
     @DataBoundSetter
-    public JsonEditorParameterDefinition setStartVal(String startval) {
-        this.startval = replaceEmpty(startval);
-        return this;
+    public void setOptions(String options) {
+        log.fine("setOptions: " + options);
+        checkValidJson(options, "options must be valid json");
+        this.options = options;
     }
 
+    @Restricted(DoNotUse.class) // index.jelly
     public String getMergedOptions() throws IOException {
-        JSON std = JSON.std;
-        Map<String, Object> optionMap = std.mapFrom(options);
-        optionMap.put("startval", std.mapFrom(startval));
-        optionMap.put("schema", std.mapFrom(schema));
-        return std.asString(optionMap);
+        Map<String, Object> optionMap = new HashMap<>(toMap(options));
+        optionMap.put("startval", toMap(startval));
+        optionMap.put("schema", toMap(schema));
+        return JSON.std.asString(optionMap);
+    }
+
+    @Override
+    public ParameterDefinition copyWithDefaultValue(ParameterValue defaultValue) {
+        if (defaultValue instanceof JsonEditorParameterValue) {
+            JsonEditorParameterDefinition def = new JsonEditorParameterDefinition(getName());
+            def.setDescription(getDescription());
+            JsonEditorParameterValue value = (JsonEditorParameterValue) defaultValue;
+            def.setStartval(value.getValue());
+            return def;
+        } else {
+            return this;
+        }
     }
 
     @Override
     public ParameterValue createValue(StaplerRequest request, JSONObject jo) {
+        log.info("createValue jo=" + jo);
         StringParameterValue value = request.bindJSON(StringParameterValue.class, jo);
         value.setDescription(getDescription());
         return value;
@@ -73,28 +133,34 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
 
     @Override
     public ParameterValue createValue(StaplerRequest request) {
+        log.info("createValue request=" + request.getRequestURIWithQueryString());
         String[] value = request.getParameterValues(getName());
         if (value == null) {
+            log.info("returning default null value");
             return getDefaultParameterValue();
         } else if (value.length != 1) {
             throw new IllegalArgumentException(
                     "Illegal number of parameter values for " + getName() + ": " + value.length);
         } else {
+            log.info("returning " + Arrays.toString(value));
             return createValue(value[0]);
         }
     }
 
     @SneakyThrows
     public ParameterValue createValue(String str) {
-        Map map = JSON.std.mapFrom(str);
-        return new MapParameterValue(getName(), getDescription(), map);
+        log.info("createValue " + str);
+        Map<String, Object> map = JSON.std.mapFrom(str);
+        return new JsonEditorParameterValue(getName(), getDescription(), map);
     }
 
     @Extension
     @Symbol({"jsonEditor"})
     public static class DescriptorImpl extends ParameterDescriptor {
 
-        private static final Pattern OK_NAME = Pattern.compile("[A-Za-z][\\w-]{0,63}");
+        public DescriptorImpl() {
+            log.fine("DescriptorImpl");
+        }
 
         private static FormValidation isValidJson(String options, String errorMessage) {
             try {
@@ -105,23 +171,45 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
             }
         }
 
+        @POST
         public FormValidation doCheckName(@QueryParameter String name) {
-            if (OK_NAME.matcher(name).matches()) {
-                return FormValidation.ok();
-            }
-            return FormValidation.error("Name should match regular expression [A-Za-z][\\w-]{0,63}");
+            log.fine("doCheckName " + name);
+            return isValidName(name)
+                    ? FormValidation.ok()
+                    : FormValidation.error("Name should match regular expression [A-Za-z][\\w-]{0,63}");
         }
 
+        @POST
         public FormValidation doCheckOptions(@QueryParameter String options) {
+            log.fine("doCheckOptions " + options);
             return isValidJson(options, "options must be valid json");
         }
 
-        public FormValidation doCheckScheme(@QueryParameter String scheme) {
-            return isValidJson(scheme, "scheme must be valid json");
+        @POST
+        public FormValidation doCheckSchema(@QueryParameter String schema) {
+            log.fine("doCheckSchema " + schema);
+            return isValidJson(schema, "schema must be valid json");
         }
 
-        public FormValidation doCheckStartVal(@QueryParameter String startVal) {
-            return isValidJson(startVal, "startVal must be valid json");
+        @POST
+        public FormValidation doCheckStartval(@QueryParameter String startval) {
+            log.fine("doCheckStartval " + startval);
+            return isValidJson(startval, "startval must be valid json");
+        }
+
+        @Override
+        public JsonEditorParameterDefinition newInstance(StaplerRequest req, JSONObject formData) {
+            log.fine("newInstance");
+            log.fine("formData=" + formData);
+
+            String name = formData.getString("name");
+            JsonEditorParameterDefinition def = new JsonEditorParameterDefinition(name);
+
+            def.setSchema(formData.getString("schema"));
+            def.setStartval(formData.getString("startval"));
+            def.setOptions(formData.getString("options"));
+
+            return def;
         }
 
         @Override

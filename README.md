@@ -3,11 +3,35 @@
 ## Introduction
 
 Add choices to an input step using the [json-editor](https://github.com/json-editor/json-editor) web form.
+The json editor generates an HTML form from a JSON Schema.
 
 ## Getting started
 
-TODO Tell users how to configure your plugin here, include screenshots, pipeline examples and 
-configuration-as-code examples.
+There are two principal configuration parameters: `schema`, which contains the json schema of the input form; and
+`startval`, which contains the starting values of the form.  An additional parameter `options` contains the lesser used
+parameters which configure the form.  See [options](https://github.com/json-editor/json-editor#options) for additional
+information.
+
+### Pipeline Example
+
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello') {
+            steps {
+                script {
+                    def values= input message: 'an input test', parameters: [
+                        jsonEditor(name: 'First', schema: '{"type":"object","title":"Car","properties":{"make":{"type":"string","enum":["Toyota","BMW","Honda","Ford","Chevy","VW"]},"model":{"type":"string"},"year":{"type":"integer","enum":[1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014],"default":2008},"safety":{"type":"integer","format":"rating","maximum":"5","exclusiveMaximum":false,"readonly":false}}}', startval: '{"make":"Toyota","safety":4}')
+                    ]
+                    println(values)
+                }
+            }
+        }
+    }
+}
+```
 
 ## Issues
 
@@ -18,9 +42,9 @@ Report issues and enhancements in the [Jenkins issue tracker](https://issues.jen
 
 ## Contributing
 
-TODO review the default [CONTRIBUTING](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) file and make sure it is appropriate for your plugin, if not then add your own one adapted from the base file
+Pull requests are welcome!
 
-Refer to our [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md)
+Refer to Jenkins [contribution guidelines](https://github.com/jenkinsci/.github/blob/master/CONTRIBUTING.md) for useful information.
 
 ## LICENSE
 

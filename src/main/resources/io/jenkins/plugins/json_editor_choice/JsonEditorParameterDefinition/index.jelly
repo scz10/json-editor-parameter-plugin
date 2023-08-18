@@ -1,16 +1,23 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" escapeText="">
 
-  <div id="editor:${it.name}:holder">&amp;nbsp;</div>
-  <div id="editor:${it.name}:options" hidden="hidden"><j:out value='${it.getMergedOptions()}'/></div>
-  <input id="editor:${it.name}:value" type="hidden"/>
+  <div id='editor:${it.name}:holder'>&amp;nbsp;</div>
+  <div id='editor:${it.name}:options' hidden="hidden"><j:out value='${it.getMergedOptions()}'/></div>
+
+  <div name="parameter">
+    <input name='name' value='${it.name}' type='hidden'/>
+    <input id='editor:${it.name}:value' name='value' type='hidden'/>
+  </div>
+
   <script>
   {
     const holderElement = document.getElementById('editor:${it.name}:holder')
-    const options = JSON.parse(document.getElementById('editor:${it.name}:options').innerHTML)
-    const editor = new JSONEditor(holderElement, options)
-
     const valueElement = document.getElementById('editor:${it.name}:value')
+
+    const options = JSON.parse(document.getElementById('editor:${it.name}:options').innerHTML)
+    valueElement.value = JSON.stringify(options.startval)
+
+    const editor = new JSONEditor(holderElement, options)
     editor.on('change', function() { valueElement.value = JSON.stringify(editor.getValue()) } );
   }
   </script>
