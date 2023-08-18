@@ -1,0 +1,10 @@
+<?jelly escape-by-default='true'?>
+<div>
+  Add parameters to an input step using a <a href='https://github.com/json-editor/json-editor'>json-editor</a> web form.
+  The json editor generates an HTML form from a JSON Schema.
+  <br/>
+  There are two principal configuration parameters: <b>schema</b>, which contains the json schema of the input form; and
+  <b>startval</b>, which contains the starting values of the form. An additional parameter `options` contains the lesser
+  used parameters which configure the form. See <a href='https://github.com/json-editor/json-editor#options'>options</a>
+  for additional information.
+</div>
