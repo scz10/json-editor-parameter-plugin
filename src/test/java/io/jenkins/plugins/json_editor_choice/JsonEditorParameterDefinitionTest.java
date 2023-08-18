@@ -44,12 +44,12 @@ public class JsonEditorParameterDefinitionTest {
     public void configSimple() throws Exception {
         URL url = getClass().getResource("car.json");
         Assertions.assertNotNull(url);
-        String schema = Files.readString(Paths.get(url.toURI()));
+
+        JsonEditorParameterDefinition def = new JsonEditorParameterDefinition(FIRST_PARAM);
+        def.setSchema(Files.readString(Paths.get(url.toURI())));
 
         final FreeStyleProject p = j.createFreeStyleProject();
-        p.addProperty(
-                new ParametersDefinitionProperty(new JsonEditorParameterDefinition(FIRST_PARAM).setSchema(schema)));
-
+        p.addProperty(new ParametersDefinitionProperty(def));
         j.configRoundtrip(p);
     }
 }
