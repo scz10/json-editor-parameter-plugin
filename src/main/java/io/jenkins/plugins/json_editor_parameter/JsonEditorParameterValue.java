@@ -1,19 +1,25 @@
 package io.jenkins.plugins.json_editor_parameter;
 
 import hudson.model.ParameterValue;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
+import org.kohsuke.stapler.DataBoundConstructor;
 
-@EqualsAndHashCode(callSuper = true)
 @Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
 public class JsonEditorParameterValue extends ParameterValue {
 
-    private String json;
+    private final String json;
 
-    public JsonEditorParameterValue(String name, String description, String json) {
-        super(name, description);
-        this.json = json;
+    @DataBoundConstructor
+    public JsonEditorParameterValue(String name, String value) {
+        super(name);
+        this.json = value;
+    }
+
+    @Override
+    public Map<String, Object> getValue() {
+        return JsonUtil.toObject(json);
     }
 }

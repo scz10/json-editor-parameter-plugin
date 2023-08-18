@@ -1,20 +1,18 @@
 package io.jenkins.plugins.json_editor_parameter;
 
-import com.fasterxml.jackson.jr.ob.JSON;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParameterValue;
-import hudson.model.StringParameterValue;
 import hudson.util.FormValidation;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.SneakyThrows;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 import org.jenkinsci.Symbol;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.DoNotUse;
@@ -42,15 +40,10 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
         }
     }
 
-    @SneakyThrows
-    static Map<String, Object> toMap(String json) {
-        return json == null || json.isEmpty() ? Map.of() : JSON.std.mapFrom(json);
-    }
-
-    private static void checkValidJson(String options, String errorMessage) {
+    private static void checkValidJson(String json, String errorMessage) {
         try {
-            JSON.std.mapFrom(options);
-        } catch (IOException e) {
+            JSONSerializer.toJSON(json);
+        } catch (JSONException e) {
             throw new IllegalArgumentException(errorMessage);
         }
     }
@@ -78,19 +71,19 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
     }
 
     @Restricted(DoNotUse.class) // invoked from index.jelly
-    public String getMergedOptions() throws IOException {
-        Map<String, Object> optionMap = new HashMap<>(toMap(options));
-        optionMap.put("startval", toMap(startval));
-        optionMap.put("schema", toMap(schema));
-        return JSON.std.asString(optionMap);
+    public String getMergedOptions() {
+        Map<String, Object> optionMap = new HashMap<>(JsonUtil.toObject(options));
+        optionMap.put("startval", JsonUtil.toObject(startval));
+        optionMap.put("schema", JsonUtil.toObject(schema));
+        return JsonUtil.toJson(optionMap);
     }
 
     @Override
-    public ParameterDefinition copyWithDefaultValue(ParameterValue defaultValue) {
+    public JsonEditorParameterDefinition copyWithDefaultValue(ParameterValue defaultValue) {
         if (defaultValue instanceof JsonEditorParameterValue) {
             JsonEditorParameterDefinition def = new JsonEditorParameterDefinition(getName());
             def.setDescription(getDescription());
-            def.setStartval((String) defaultValue.getValue());
+            def.setStartval(((JsonEditorParameterValue) defaultValue).getJson());
             return def;
         } else {
             return this;
@@ -98,17 +91,17 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
     }
 
     @Override
-    public ParameterValue createValue(StaplerRequest request, JSONObject jo) {
-        StringParameterValue value = request.bindJSON(StringParameterValue.class, jo);
+    public JsonEditorParameterValue createValue(StaplerRequest request, JSONObject jo) {
+        JsonEditorParameterValue value = request.bindJSON(JsonEditorParameterValue.class, jo);
         value.setDescription(getDescription());
         return value;
     }
 
     @Override
-    public ParameterValue createValue(StaplerRequest request) {
+    public JsonEditorParameterValue createValue(StaplerRequest request) {
         String[] value = request.getParameterValues(getName());
         if (value == null) {
-            return getDefaultParameterValue();
+            return null;
         } else if (value.length != 1) {
             throw new IllegalArgumentException(
                     "Illegal number of parameter values for " + getName() + ": " + value.length);
@@ -117,9 +110,8 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
         }
     }
 
-    @SneakyThrows
-    public ParameterValue createValue(String json) {
-        return new JsonEditorParameterValue(getName(), getDescription(), json);
+    public JsonEditorParameterValue createValue(String json) {
+        return new JsonEditorParameterValue(getName(), json);
     }
 
     @Extension
@@ -128,9 +120,9 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
 
         private static FormValidation isValidJson(String options, String errorMessage) {
             try {
-                JSON.std.mapFrom(options);
+                checkValidJson(options, errorMessage);
                 return FormValidation.ok();
-            } catch (IOException e) {
+            } catch (IllegalArgumentException e) {
                 return FormValidation.error(errorMessage);
             }
         }
