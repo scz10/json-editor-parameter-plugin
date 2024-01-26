@@ -1,2 +1,2 @@
 _extends: .github
-tag-template: json-editor-choice-$NEXT_MINOR_VERSION
+tag-template: json-editor-parameter-plugin-$NEXT_MINOR_VERSION

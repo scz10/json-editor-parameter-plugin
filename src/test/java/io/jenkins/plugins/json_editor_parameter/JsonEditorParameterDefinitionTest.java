@@ -1,14 +1,14 @@
 package io.jenkins.plugins.json_editor_parameter;
 
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
 import hudson.model.FreeStyleProject;
 import hudson.model.Job;
 import hudson.model.ParametersDefinitionProperty;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.htmlunit.html.HtmlElement;
+import org.htmlunit.html.HtmlPage;
+import org.htmlunit.html.HtmlTextInput;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
