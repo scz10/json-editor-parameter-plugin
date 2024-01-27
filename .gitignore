@@ -1,4 +1,5 @@
 target
+*.bak
 
 # mvn hpi:run
 work
