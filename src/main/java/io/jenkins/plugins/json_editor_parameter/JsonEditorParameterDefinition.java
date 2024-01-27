@@ -8,6 +8,7 @@ import hudson.util.FormValidation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import jenkins.model.Jenkins;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.sf.json.JSONException;
@@ -72,9 +73,9 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
 
     @Restricted(DoNotUse.class) // invoked from index.jelly
     public String getMergedOptions() {
-        Map<String, Object> optionMap = new HashMap<>(JsonUtil.toObject(options));
+        Map<String, Object> optionMap = new HashMap<>(JsonUtil.toMap(options));
         optionMap.put("startval", JsonUtil.toObject(startval));
-        optionMap.put("schema", JsonUtil.toObject(schema));
+        optionMap.put("schema", JsonUtil.toMap(schema));
         return JsonUtil.toJson(optionMap);
     }
 
@@ -130,6 +131,7 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
         @Override
         @POST
         public FormValidation doCheckName(@QueryParameter String name) {
+            Jenkins.get().checkPermission(Jenkins.READ);
             return isValidName(name)
                     ? FormValidation.ok()
                     : FormValidation.error("Name should match regular expression [A-Za-z][\\w-]{0,63}");
@@ -138,18 +140,21 @@ public class JsonEditorParameterDefinition extends ParameterDefinition {
         @Override
         @POST
         public FormValidation doCheckOptions(@QueryParameter String options) {
+            Jenkins.get().checkPermission(Jenkins.READ);
             return isValidJson(options, "options must be valid json");
         }
 
         @Override
         @POST
         public FormValidation doCheckSchema(@QueryParameter String schema) {
+            Jenkins.get().checkPermission(Jenkins.READ);
             return isValidJson(schema, "schema must be valid json");
         }
 
         @Override
         @POST
         public FormValidation doCheckStartval(@QueryParameter String startval) {
+            Jenkins.get().checkPermission(Jenkins.READ);
             return isValidJson(startval, "startval must be valid json");
         }
 

@@ -19,8 +19,12 @@ public class JsonUtil {
         return JSONSerializer.toJSON(objectMap).toString();
     }
 
-    Map<String, Object> toObject(String json) {
-        if (json == null || json.isEmpty()) {
+    Map<String, Object> toMap(String json) {
+        if (json == null) {
+            return Map.of();
+        }
+        json = json.trim();
+        if (json.isEmpty()) {
             return Map.of();
         }
 
@@ -29,6 +33,18 @@ public class JsonUtil {
             return toJavaUtilMap((JSONObject) jsonObject);
         }
         throw new IllegalArgumentException("Not a json object");
+    }
+
+    Object toObject(String json) {
+        if (json == null) {
+            return null;
+        }
+        json = json.trim();
+        if (json.isEmpty()) {
+            return null;
+        }
+
+        return toJavaUtil(JSONSerializer.toJSON(json));
     }
 
     Object toJavaUtil(Object object) {

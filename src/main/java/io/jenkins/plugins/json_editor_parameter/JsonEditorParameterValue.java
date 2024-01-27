@@ -1,7 +1,6 @@
 package io.jenkins.plugins.json_editor_parameter;
 
 import hudson.model.ParameterValue;
-import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -19,7 +18,7 @@ public class JsonEditorParameterValue extends ParameterValue {
     }
 
     @Override
-    public Map<String, Object> getValue() {
+    public Object getValue() {
         return JsonUtil.toObject(json);
     }
 }
