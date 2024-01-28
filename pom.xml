@@ -142,7 +142,7 @@
             <configuration>
               <rules>
                 <requireJavaVersion>
-                  <version>[${maven.compiler.release},)</version>
+                  <version>[11,)</version>
                 </requireJavaVersion>
                 <requireMavenVersion>
                   <version>[${maven.version},)</version>
