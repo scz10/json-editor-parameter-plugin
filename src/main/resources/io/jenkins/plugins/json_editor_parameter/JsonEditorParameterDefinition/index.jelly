@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" escapeText="">
+<j:jelly xmlns:j="jelly:core">
 
-  <div id='editor:${it.name}:holder'>&amp;nbsp;</div>
+  <div id='editor:${it.name}:holder'/>
   <div id='editor:${it.name}:options' hidden="hidden"><j:out value='${it.getMergedOptions()}'/></div>
 
   <div name="parameter">
