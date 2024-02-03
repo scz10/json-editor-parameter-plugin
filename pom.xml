@@ -16,7 +16,7 @@
 
   <name>Json Editor Parameter</name>
 
-  <url>https://github.com/jenkinsci/${project.artifactId}</url>
+  <url>https://github.com/${gitHubRepo}</url>
   <inceptionYear>2023</inceptionYear>
 
   <licenses>
@@ -35,7 +35,7 @@
 
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
-    <gitHubRepo>jenkinsci/${project.artifactId}</gitHubRepo>
+    <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
 
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.version>2.401.2</jenkins.version>
