@@ -14,7 +14,7 @@
     const holderElement = document.getElementById('editor:${it.name}:holder')
     const valueElement = document.getElementById('editor:${it.name}:value')
 
-    const options = JSON.parse(document.getElementById('editor:${it.name}:options').innerHTML)
+    const options = JSON.parse(document.getElementById('editor:${it.name}:options').textContent)
     valueElement.value = JSON.stringify(options.startval)
 
     const editor = new JSONEditor(holderElement, options)
