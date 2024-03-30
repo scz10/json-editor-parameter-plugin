@@ -20,6 +20,11 @@ public class JsonEditorParameterValue extends ParameterValue {
         this.json = value;
     }
 
+    public JsonEditorParameterValue(String name, String value, String description) {
+        super(name, description);
+        this.json = value;
+    }
+
     @Override
     public void buildEnvironment(Run<?, ?> build, EnvVars env) {
         env.put(name, json);
