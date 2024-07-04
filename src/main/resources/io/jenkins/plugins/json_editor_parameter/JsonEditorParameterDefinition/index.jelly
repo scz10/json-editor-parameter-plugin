@@ -10,6 +10,17 @@
       <input id='editor:${it.name}:value' name='value' type='hidden'/>
     </div>
   </f:entry>
+  
+
+  <st:adjunct includes="io.jenkins.plugins.json_editor_parameter.JsonEditorParameterDefinition.ace.ace" />
+
+  <st:adjunct includes="io.jenkins.plugins.json_editor_parameter.JsonEditorParameterDefinition.flatpickr_min" />
+  <st:adjunct includes="io.jenkins.plugins.json_editor_parameter.JsonEditorParameterDefinition.handlebars" />
+
+  <st:adjunct includes="io.jenkins.plugins.json_editor_parameter.JsonEditorParameterDefinition.icons_min" />
+  
+  <st:adjunct includes="io.jenkins.plugins.json_editor_parameter.JsonEditorParameterDefinition.bootstrap_bundle_min" />
+  <st:adjunct includes="io.jenkins.plugins.json_editor_parameter.JsonEditorParameterDefinition.bootstrap_min" />
 
   <st:adjunct includes="io.jenkins.plugins.json_editor_parameter.JsonEditorParameterDefinition.jsoneditor" />
   <st:adjunct includes="io.jenkins.plugins.json_editor_parameter.JsonEditorParameterDefinition.jsoneditor_min" />
